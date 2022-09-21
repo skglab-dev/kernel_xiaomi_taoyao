@@ -3947,10 +3947,11 @@ static inline void ufshcd_add_delay_before_dme_cmd(struct ufs_hba *hba)
 			min_sleep_time_us = 0; /* no more delay required */
 	}
 
-	if (min_sleep_time_us > 0) {
-		/* allow sleep for extra 50us if needed */
+	/* allow sleep for extra 50us if needed */
+	if (!oops_in_progress)
 		usleep_range(min_sleep_time_us, min_sleep_time_us + 50);
-	}
+	else
+		udelay(min_sleep_time_us);
 
 	/* update the last_dme_cmd_tstamp */
 	hba->last_dme_cmd_tstamp = ktime_get();

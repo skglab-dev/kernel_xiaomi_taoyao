@@ -4280,6 +4280,7 @@ static void sdhci_msm_set_caps(struct sdhci_msm_host *msm_host)
 	if (!msm_host->mmc->partial_init_broken)
 		msm_host->mmc->caps2 |= MMC_CAP2_CLK_SCALE;
 #endif
+	msm_host->mmc->caps2 |= MMC_CAP2_MAX_DISCARD_SIZE;
 }
 
 static int sdhci_msm_probe(struct platform_device *pdev)

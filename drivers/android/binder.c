@@ -822,8 +822,12 @@ static void binder_transaction_priority(struct binder_thread *thread,
 	t->set_priority_called = true;
 
 	if (!node->inherit_rt && is_rt_policy(desired.sched_policy)) {
-		desired.prio = NICE_TO_PRIO(0);
-		desired.sched_policy = SCHED_NORMAL;
+		// MIUI MOD:
+		// We boost some app process to FIFO, but binder out thread
+		// from fifo has low priority, so we modify priority higher.
+		// desired_prio.prio = NICE_TO_PRIO(0);
+		desired_prio.prio = NICE_TO_PRIO(-10);
+		desired_prio.sched_policy = SCHED_NORMAL;
 	}
 
 	if (node_prio.prio < t->priority.prio ||
@@ -2926,6 +2930,9 @@ static int binder_proc_transaction(struct binder_transaction *t,
 	bool oneway = !!(t->flags & TF_ONE_WAY);
 	bool pending_async = false;
 	struct binder_transaction *t_outdated = NULL;
+	#ifdef CONFIG_PERF_HUMANTASK
+	int  task_pri = 0;
+	#endif
 
 	BUG_ON(!node);
 	binder_node_lock(node);
@@ -2956,6 +2963,17 @@ static int binder_proc_transaction(struct binder_transaction *t,
 		thread = binder_select_thread_ilocked(proc);
 
 	if (thread) {
+		#ifdef CONFIG_PERF_HUMANTASK
+		if (t->from && t->from->task) {
+			task_pri = t->from->task->human_task;
+		}
+		if (!oneway && task_pri && task_pri <=4 ) {
+		   if (thread->task && !t->from->task->inherit_task) {
+			thread->task->human_task++;
+			thread->task->inherit_task = 1;
+		    }
+		}
+		#endif
 		binder_transaction_priority(thread, t, node);
 		binder_enqueue_thread_work_ilocked(thread, &t->work);
 	} else if (!pending_async) {
@@ -3787,6 +3805,9 @@ static void binder_transaction(struct binder_proc *proc,
 		BUG_ON(target_node == NULL);
 		BUG_ON(t->buffer->async_transaction != 1);
 		binder_enqueue_thread_work(thread, tcomplete);
+		//MIUI ADD:
+		t->timesRecord = binder_clock();
+		//END
 		return_error = binder_proc_transaction(t, target_proc, NULL);
 		if (return_error)
 			goto err_dead_proc_or_thread;
@@ -4733,6 +4754,12 @@ retry:
 						 binder_stop_on_user_error < 2);
 		}
 		trace_android_vh_binder_restore_priority(NULL, current);
+#ifdef CONFIG_SF_BINDER
+		if (flag) {
+			proc->default_priority.sched_policy = current->policy;
+			proc->default_priority.prio = current->normal_prio;
+		}
+#endif
 		binder_restore_priority(thread, &proc->default_priority);
 	}
 
