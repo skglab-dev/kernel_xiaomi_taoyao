@@ -1041,6 +1041,16 @@ void fuse_send_init(struct fuse_conn *fc)
 		process_init_reply(fc, &ia->args, -ENOTCONN);
 }
 EXPORT_SYMBOL_GPL(fuse_send_init);
+#if defined(CONFIG_PASSTHROUGH_SYSTEM)
+static int free_fuse_passthrough(int id, void *p, void *data)
+{
+	struct fuse_passthrough *passthrough = (struct fuse_passthrough *)p;
+	fuse_passthrough_release(passthrough);
+	kfree(p);
+
+	return 0;
+}
+#endif
 
 static int free_fuse_passthrough(int id, void *p, void *data)
 {
@@ -1082,7 +1092,7 @@ static int fuse_bdi_init(struct fuse_conn *fc, struct super_block *sb)
 
 	sb->s_bdi->ra_pages = VM_READAHEAD_PAGES;
 	/* fuse does it's own writeback accounting */
-	sb->s_bdi->capabilities = BDI_CAP_NO_ACCT_WB | BDI_CAP_STRICTLIMIT;
+	sb->s_bdi->capabilities = BDI_CAP_NO_ACCT_WB;
 
 	/*
 	 * For a single fuse filesystem use max 1% of dirty +

@@ -161,6 +161,7 @@ gpumem_mapped_show(struct kgsl_process_private *priv,
 				int type, char *buf)
 {
 	return scnprintf(buf, PAGE_SIZE, "%lld\n",
+
 			atomic64_read(&priv->gpumem_mapped));
 }
 
@@ -477,6 +478,8 @@ static vm_fault_t kgsl_paged_vmfault(struct kgsl_memdesc *memdesc,
 		return VM_FAULT_SIGBUS;
 
 	pgoff = offset >> PAGE_SHIFT;
+	if( !memdesc->pages)
+		return VM_FAULT_NOPAGE;
 
 	return vmf_insert_page(vma, vmf->address, memdesc->pages[pgoff]);
 }

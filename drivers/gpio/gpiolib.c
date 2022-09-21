@@ -28,7 +28,6 @@
 #include <linux/poll.h>
 #include <linux/timekeeping.h>
 #include <uapi/linux/gpio.h>
-
 #include "gpiolib.h"
 #include "gpiolib-of.h"
 #include "gpiolib-acpi.h"
@@ -1288,7 +1287,7 @@ int gpiochip_add_data_with_key(struct gpio_chip *chip, void *data,
 	if (chip->parent) {
 		gdev->dev.parent = chip->parent;
 		gdev->dev.of_node = chip->parent->of_node;
-	}
+}
 
 #ifdef CONFIG_OF_GPIO
 	/* If the gpiochip has an assigned OF node this takes precedence */

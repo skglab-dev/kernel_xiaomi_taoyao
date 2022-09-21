@@ -108,7 +108,6 @@ ssize_t fuse_passthrough_read_iter(struct kiocb *iocb_fuse,
 			ret = -ENOMEM;
 			goto out;
 		}
-
 		aio_req->iocb_fuse = iocb_fuse;
 		kiocb_clone(&aio_req->iocb, iocb_fuse, passthrough_filp);
 		aio_req->iocb.ki_complete = fuse_aio_rw_complete;
@@ -159,7 +158,6 @@ ssize_t fuse_passthrough_write_iter(struct kiocb *iocb_fuse,
 			ret = -ENOMEM;
 			goto out;
 		}
-
 		file_start_write(passthrough_filp);
 		__sb_writers_release(passthrough_inode->i_sb, SB_FREEZE_WRITE);
 

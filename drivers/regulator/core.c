@@ -6266,6 +6266,7 @@ static int _regulator_debug_print_enabled(struct device *dev, void *data)
  */
 void regulator_debug_print_enabled(void)
 {
+
 	if (likely(!debug_suspend))
 		return;
 
