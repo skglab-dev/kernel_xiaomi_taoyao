@@ -29,6 +29,11 @@ ifeq ($(CONFIG_SND_SOC_AUTO), y)
 		export
 		INCS    +=  -include $(AUDIO_ROOT)/config/gvmautoconf.h
 	endif
+	ifdef CONFIG_SND_SOC_AR
+		include $(AUDIO_ROOT)/config/arauto.conf
+		export
+		INCS    +=  -include $(AUDIO_ROOT)/config/arautoconf.h
+	endif
 	ifdef CONFIG_SND_SOC_GVM_SA8295
 		include $(AUDIO_ROOT)/config/sa8295gvmauto.conf
 		export
@@ -55,6 +60,10 @@ else
 		ifeq ($(CONFIG_ARCH_KONA), y)
 			include $(AUDIO_ROOT)/config/konaauto.conf
 			INCS    +=  -include $(AUDIO_ROOT)/config/konaautoconf.h
+		endif
+		ifeq ($(CONFIG_ARCH_LAHAINA), y)
+			include $(AUDIO_ROOT)/config/lahainaauto.conf
+			INCS    +=  -include $(AUDIO_ROOT)/config/lahainaautoconf.h
 		endif
 		ifeq ($(CONFIG_ARCH_LITO), y)
 			include $(AUDIO_ROOT)/config/litoauto.conf
@@ -143,9 +152,6 @@ ifdef CONFIG_SND_SOC_MSM_QDSP6V2_INTF
 	Q6_OBJS += adsp_err.o
 	Q6_OBJS += msm_audio_ion.o
 	Q6_OBJS += q6_init.o
-	Q6_OBJS += model_loader.o
-endif
-
 # for ELUS start
 ifdef CONFIG_ELUS_PROXIMITY
 	Q6_OBJS += apr_elliptic.o
@@ -169,6 +175,7 @@ ifdef CONFIG_MIUS_PROXIMITY
 	Q6_OBJS += mius/io_modules/userspace/mius_data_userspace_ctrl.o
 endif
 # for MIUS end
+endif
 
 ifdef CONFIG_SND_SOC_MSM_QDSP6V2_VM
 	Q6_OBJS += msm-audio-event-notify.o
@@ -228,10 +235,6 @@ ifdef CONFIG_MSM_MDF
 	Q6_OBJS += msm_mdf.o
 endif
 
-ifdef CONFIG_MSM_CSPL
-	Q6_OBJS += msm-cirrus-playback.o
-endif
-
 ifdef CONFIG_VOICE_MHI
 	Q6_OBJS += voice_mhi.o
 endif
@@ -247,45 +250,6 @@ INCS +=		$(COMMON_INC) \
 
 EXTRA_CFLAGS += $(INCS)
 
-ifneq (,$(filter $(TARGET_PRODUCT),cetus))
-	CDEFINES += -DCONFIG_TARGET_PRODUCT_CETUS
-endif
-
-ifneq (,$(filter $(TARGET_PRODUCT),odin))
-	CDEFINES += -DCONFIG_TARGET_PRODUCT_ODIN
-endif
-
-ifneq (,$(filter $(TARGET_PRODUCT),vili))
-	CDEFINES += -DCONFIG_TARGET_PRODUCT_VILI
-endif
-
-
-ifeq ($(TARGET_PRODUCT), renoir)
-	CDEFINES += -DCONFIG_SND_SOC_TFA9874_FOR_DAVI
-	CDEFINES += -DTFA_NON_DSP_SOLUTION
-endif
-
-ifeq ($(TARGET_PRODUCT), taoyao)
-	CDEFINES += -DCONFIG_SND_SOC_TFA9874_FOR_DAVI
-	CDEFINES += -DTFA_NON_DSP_SOLUTION
-	CDEFINES += -DCONFIG_TARGET_PRODUCT_TAOYAO
-endif
-
-ifeq ($(TARGET_PRODUCT), lisa)
-	CDEFINES += -DCONFIG_SND_SOC_TFA9874_FOR_DAVI
-	CDEFINES += -DTFA_NON_DSP_SOLUTION
-	CDEFINES += -DCONFIG_TARGET_PRODUCT_LISA
-endif
-
-ifeq ($(TARGET_PRODUCT), mona)
-	CDEFINES += -DCONFIG_SND_SOC_AW88263S_TDM
-	CDEFINES += -DCONFIG_TARGET_PRODUCT_MONA
-endif
-
-ifeq ($(TARGET_PRODUCT), zijin)
-	CDEFINES += -DCONFIG_SND_SOC_AW88263S_TDM
-	CDEFINES += -DCONFIG_TARGET_PRODUCT_ZIJIN
-endif
 
 CDEFINES +=	-DANI_LITTLE_BYTE_ENDIAN \
 		-DANI_LITTLE_BIT_ENDIAN \
@@ -297,15 +261,12 @@ CDEFINES +=	-DANI_LITTLE_BYTE_ENDIAN \
 		-Werror\
 		-D__linux__
 
-# TEST FOR STAR
-ifneq (,$(filter $(TARGET_PRODUCT), star))
-        CDEFINES += -DAUDIO_FORCE_RESTART_ADSP
-endif
-
-ifeq ($(TARGET_PRODUCT), $(filter $(TARGET_PRODUCT), zijin taoyao))
+ifeq ($(TARGET_PRODUCT), taoyao)
+CDEFINES += -DCONFIG_SND_SOC_TFA9874_FOR_DAVI
+CDEFINES += -DTFA_NON_DSP_SOLUTION
+CDEFINES += -DCONFIG_TARGET_PRODUCT_TAOYAO
 CDEFINES += -DAUDIO_FORCE_RESTART_ADSP_TEMP
 endif
-
 
 KBUILD_CPPFLAGS += $(CDEFINES)
 

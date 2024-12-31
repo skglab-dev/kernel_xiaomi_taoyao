@@ -14,7 +14,10 @@ int voice_init(void);
 int audio_cal_init(void);
 int core_init(void);
 int rtac_init(void);
+<<<<<<< HEAD
 
+=======
+>>>>>>> 58b0bd6381c71d83d24cff368c0ca33286f174da
 int msm_audio_ion_init(void);
 #if IS_ENABLED(CONFIG_MSM_AVTIMER)
 int avtimer_init(void);
@@ -23,9 +26,6 @@ static inline int avtimer_init(void)
 {
 	return 0;
 }
-#endif
-#ifdef CONFIG_MSM_CSPL
-int crus_sp_init(void);
 #endif
 #ifdef CONFIG_MSM_MDF
 int msm_mdf_init(void);
@@ -71,9 +71,6 @@ static inline void avtimer_exit(void)
 {
 	return;
 }
-#endif
-#ifdef CONFIG_MSM_CSPL
-void crus_sp_exit(void);
 #endif
 void msm_audio_ion_exit(void);
 void rtac_exit(void);
