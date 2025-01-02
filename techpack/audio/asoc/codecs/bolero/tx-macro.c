@@ -663,6 +663,12 @@ static int tx_macro_put_dec_enum(struct snd_kcontrol *kcontrol,
 	}
 	if (strnstr(widget->name, "SMIC", strlen(widget->name))) {
 		if (val != 0) {
+#if defined(CONFIG_TARGET_PRODUCT_TAOYAO)
+            snd_soc_component_update_bits(component,
+					mic_sel_reg,
+					1 << 7, 0x0 << 7);
+			dev_dbg(component->dev, "%s: SMIC enter val=%d\n", __func__,val);
+#else
 			if (val < 5) {
 				snd_soc_component_update_bits(component,
 							mic_sel_reg,
@@ -681,6 +687,7 @@ static int tx_macro_put_dec_enum(struct snd_kcontrol *kcontrol,
 					dmic_clk_reg,
 					0x0E, tx_priv->dmic_clk_div << 0x1);
 			}
+#endif
 		}
 	} else {
 		/* DMIC selected */

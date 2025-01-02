@@ -22,6 +22,12 @@
 #include "msm-dai-q6-v2.h"
 #include <asoc/core.h>
 
+#ifdef TFA_NON_DSP_SOLUTION
+#if defined(CONFIG_TARGET_PRODUCT_TAOYAO)
+#include "codecs/tfa9874/inc/tfa_platform_interface_definition.h"
+#endif
+#endif
+
 #define MSM_DAI_PRI_AUXPCM_DT_DEV_ID 1
 #define MSM_DAI_SEC_AUXPCM_DT_DEV_ID 2
 #define MSM_DAI_TERT_AUXPCM_DT_DEV_ID 3
@@ -6154,6 +6160,19 @@ static int msm_dai_q6_mi2s_hw_params(struct snd_pcm_substream *substream,
 		&mi2s_dai_data->mi2s_dai;
 	struct msm_dai_q6_dai_data *dai_data = &mi2s_dai_config->mi2s_dai_data;
 	struct afe_param_id_i2s_cfg *i2s = &dai_data->port_config.i2s;
+
+#ifdef TFA_NON_DSP_SOLUTION
+#if defined(CONFIG_TARGET_PRODUCT_TAOYAO)
+	u16 port_id = 0;
+
+	if (msm_mi2s_get_port_id(dai->id, substream->stream,
+				 &port_id) != 0) {
+		dev_err(dai->dev, "%s: Invalid Port ID 0x%x\n",
+				__func__, port_id);
+		return -EINVAL;
+	}
+#endif
+#endif
 
 	dai_data->channels = params_channels(params);
 	switch (dai_data->channels) {

@@ -573,7 +573,11 @@ static struct snd_soc_dai_driver msm_fe_dais[] = {
 	{
 		.capture = {
 			.stream_name = "TX3_CDC_DMA_HOSTLESS Capture",
-			.aif_name = "TX3_CDC_DMA_UL_HL",
+#if defined(CONFIG_TARGET_PRODUCT_TAOYAO)
+			.aif_name = "PRI_MI2S_DL_HL",		
+#else
+			.aif_name = "TERT_TDM_RX_1_DL_US",
+#endif
 			.rates = SNDRV_PCM_RATE_8000 | SNDRV_PCM_RATE_11025 |
 				SNDRV_PCM_RATE_16000 | SNDRV_PCM_RATE_22050 |
 				SNDRV_PCM_RATE_32000 | SNDRV_PCM_RATE_44100 |

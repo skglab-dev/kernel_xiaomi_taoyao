@@ -173,8 +173,13 @@ static int wcd_measure_adc_once(struct wcd_mbhc *mbhc, int mux_ctl)
 			__func__, adc_complete, adc_timeout);
 		ret = -EINVAL;
 	} else {
+#ifdef CONFIG_TARGET_PRODUCT_TAOYAO
+		pr_debug("%s: adc complete: %d, adc timeout: %d output_mV: %d mux_ctl: %d\n",
+			__func__, adc_complete, adc_timeout, output_mv, mux_ctl);
+#else
 		pr_debug("%s: adc complete: %d, adc timeout: %d output_mV: %d\n",
 			__func__, adc_complete, adc_timeout, output_mv);
+#endif
 		ret = output_mv;
 	}
 
@@ -826,8 +831,13 @@ correct_plug_type:
 				 * otherwise report unsupported plug
 				 */
 				if (mbhc->mbhc_cfg->swap_gnd_mic &&
+#ifdef CONFIG_TARGET_PRODUCT_TAOYAO
+					!(mbhc->mbhc_cfg->swap_gnd_mic(component,
+					true))) {
+#else
 					mbhc->mbhc_cfg->swap_gnd_mic(component,
 					true)) {
+#endif
 					pr_debug("%s: US_EU gpio present,flip switch\n"
 						, __func__);
 					continue;
