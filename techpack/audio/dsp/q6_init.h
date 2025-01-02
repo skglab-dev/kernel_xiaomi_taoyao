@@ -58,6 +58,12 @@ static inline void avtimer_exit(void)
 	return;
 }
 #endif
+
+#ifdef CONFIG_ELUS_PROXIMITY
+int elliptic_driver_init(void);
+int elliptic_driver_exit(void);
+#endif
+
 void msm_audio_ion_exit(void);
 void rtac_exit(void);
 void core_exit(void);

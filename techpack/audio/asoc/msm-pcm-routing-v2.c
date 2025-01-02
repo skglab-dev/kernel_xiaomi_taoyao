@@ -75,6 +75,11 @@
 #include "msm-dolby-dap-config.h"
 #include "msm-ds2-dap-config.h"
 
+#ifdef CONFIG_ELUS_PROXIMITY
+#include <dsp/apr_elliptic.h>
+#include <elliptic/elliptic_mixer_controls.h>
+#endif
+
 #ifdef CONFIG_SND_SOC_TFA9874
 #if defined(CONFIG_TARGET_PRODUCT_TAOYAO)
 #include "codecs/tfa9874/inc/tfa_platform_interface_definition.h"
@@ -43910,6 +43915,10 @@ static int msm_routing_probe(struct snd_soc_component *component)
 	snd_soc_add_component_controls(component,
 			port_multi_channel_map_mixer_controls,
 			ARRAY_SIZE(port_multi_channel_map_mixer_controls));
+
+#ifdef CONFIG_ELUS_PROXIMITY
+	elliptic_add_component_controls(component);
+#endif
 
 	snd_soc_add_component_controls(component, pll_clk_drift_controls,
 				      ARRAY_SIZE(pll_clk_drift_controls));
