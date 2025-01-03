@@ -43,6 +43,7 @@
 #include "sde_hw_qdss.h"
 #include "sde_encoder_dce.h"
 #include "sde_vm.h"
+#include "mi_sde_encoder.h"
 
 #define SDE_DEBUG_ENC(e, fmt, ...) SDE_DEBUG("enc%d " fmt,\
 		(e) ? (e)->base.base.id : -1, ##__VA_ARGS__)
@@ -1653,6 +1654,10 @@ static void _sde_encoder_rc_restart_delayed(struct sde_encoder_virt *sde_enc,
 	struct msm_drm_private *priv;
 	unsigned int lp, idle_pc_duration;
 	struct msm_drm_thread *disp_thread;
+
+	/* return early if called from esd thread */
+	if (sde_enc->delay_kickoff)
+		return;
 
 	/* set idle timeout based on master connector's lp value */
 	if (sde_enc->cur_master)
@@ -4216,6 +4221,9 @@ int sde_encoder_prepare_for_kickoff(struct drm_encoder *drm_enc,
 				sde_enc->cur_master, sde_kms->qdss_enabled);
 
 end:
+	if (sde_enc->ready_kickoff) {
+		sde_enc->prepare_kickoff = true;
+	}
 	SDE_ATRACE_END("sde_encoder_prepare_for_kickoff");
 	return ret;
 }

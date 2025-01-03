@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
 ccflags-y := -I$(srctree)/include/drm -I$(srctree)/techpack/display/msm -I$(srctree)/techpack/display/msm/dsi -I$(srctree)/techpack/display/msm/dp
 ccflags-y += -I$(srctree)/techpack/display/msm/sde
+ccflags-y += -I$(srctree)/techpack/display/msm/mi_disp
 ccflags-y += -I$(srctree)/techpack/display/rotator
 ccflags-y += -I$(srctree)/techpack/display/hdcp
 ccflags-y += -I$(srctree)/drivers/clk/qcom/
@@ -135,6 +136,25 @@ msm_drm-$(CONFIG_DRM_MSM) += \
 	msm_smmu.o \
 	msm_cooling_device.o \
 	msm_prop.o
+
+msm_drm-$(CONFIG_DRM_MSM) += \
+	mi_disp/mi_disp_notifier.o \
+	mi_disp/mi_disp_core.o \
+	mi_disp/mi_disp_feature.o \
+	mi_disp/mi_disp_sysfs.o \
+	mi_disp/mi_disp_file.o \
+	mi_disp/mi_disp_parser.o \
+	mi_disp/mi_disp_procfs.o \
+	mi_disp/mi_disp_debugfs.o \
+	mi_disp/mi_disp_print.o \
+	mi_disp/mi_disp_log.o \
+	mi_disp/mi_dsi_display.o \
+	mi_disp/mi_dsi_panel.o \
+	mi_disp/mi_sde_connector.o \
+	mi_disp/mi_sde_crtc.o \
+	mi_disp/mi_sde_encoder.o \
+	mi_disp/mi_cooling_device.o \
+	mi_disp/mi_hwconf_manager.o
 
 msm_drm-$(CONFIG_HDCP_QSEECOM) += ../hdcp/msm_hdcp.o \
 
