@@ -616,8 +616,6 @@ config XLOGCHAR
     help
       Implements a high performance log driver
 
-endmenu
-
 config RANDOM_TRUST_CPU
 	bool "Initialize RNG using CPU RNG instructions"
 	default y
