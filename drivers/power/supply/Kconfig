@@ -792,12 +792,6 @@ config RENOIR_FOR_BUILD
 	help
 	  Say Y here to enable renoir build debug
 
-config BQ_FG_1S
-	bool "BQ for one battery"
-	depends on QTI_PMIC_GLINK
-	help
-	  Say Y here to enable BQ_FG_1S
-
 source "drivers/power/supply/qcom/Kconfig"
 
 endif # POWER_SUPPLY
