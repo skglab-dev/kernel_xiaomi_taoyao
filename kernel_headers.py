@@ -110,6 +110,9 @@ def gen_version_h(verbose, gen_dir, version_makefile):
     f.write(
         '#define KERNEL_VERSION(a,b,c) ' +
         '(((a) << 16) + ((b) << 8) + (c))\n')
+    f.write('#define LINUX_VERSION_MAJOR %d\n' % version)
+    f.write('#define LINUX_VERSION_PATCHLEVEL %d\n' % patchlevel)
+    f.write('#define LINUX_VERSION_SUBLEVEL %d\n' % sublevel)
 
   return True
 
