@@ -2428,11 +2428,6 @@ int cam_sensor_util_power_down(struct cam_sensor_power_ctrl_t *ctrl,
 		case SENSOR_STANDBY:
 		case SENSOR_CUSTOM_GPIO1:
 		case SENSOR_CUSTOM_GPIO2:
-
-			if (!gpio_num_info) {
-				CAM_ERR(CAM_SENSOR, "failed: No gpio");
-				continue;
-			}
 			if (!gpio_num_info->valid[pd->seq_type])
 				continue;
 
