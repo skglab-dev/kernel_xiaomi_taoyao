@@ -1,3 +1,15 @@
+# Only include Xiaomi taoyao DTBs
+ifeq ($(CONFIG_ARCH_YUPIK), y)
+ifneq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
+$(error Xiaomi DT w/o overlay is undefined!!!)
+endif
+
+dtbo-y += taoyao-sm7325-overlay.dtbo
+
+taoyao-sm7325-overlay.dtbo-base := yupik.dtb
+
+else
+
 ifneq ($(CONFIG_ARCH_QTI_VM), y)
 ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
 dtbo-$(CONFIG_ARCH_LAHAINA) += lahaina-rumi-overlay.dtbo \
@@ -562,6 +574,7 @@ dtb-$(CONFIG_ARCH_DIREWOLF) += direwolf-ivi-rumi.dtb \
 	direwolf-ivi-adp-star.dtb \
 	direwolf-adas-rumi.dtb \
 	direwolf-adas-adp-star.dtb
+endif
 endif
 
 always		:= $(dtb-y)
