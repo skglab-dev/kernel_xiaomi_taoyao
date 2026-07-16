@@ -249,6 +249,13 @@ CDEFINES +=	-DANI_LITTLE_BYTE_ENDIAN \
 		-Werror\
 		-D__linux__
 
+CDEFINES += -DCONFIG_SND_SOC_TFA9874_FOR_DAVI
+CDEFINES += -DTFA_NON_DSP_SOLUTION
+CDEFINES += -DCONFIG_TARGET_PRODUCT_TAOYAO
+
+# Enable for taoyao
+CDEFINES += -DAUDIO_FORCE_RESTART_ADSP_TEMP
+
 KBUILD_CPPFLAGS += $(CDEFINES)
 
 # Currently, for versions of gcc which support it, the kernel Makefile
