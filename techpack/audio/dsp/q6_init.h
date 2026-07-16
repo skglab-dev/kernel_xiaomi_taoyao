@@ -27,6 +27,9 @@ static inline int avtimer_init(void)
 int msm_mdf_init(void);
 void msm_mdf_exit(void);
 #else
+#ifdef CONFIG_ELUS_PROXIMITY
+int elliptic_driver_init(void);
+#endif
 static inline int msm_mdf_init(void)
 {
 	return 0;
@@ -65,6 +68,9 @@ void audio_cal_exit(void);
 void voice_exit(void);
 void q6lsm_exit(void);
 void q6asm_exit(void);
+#ifdef CONFIG_ELUS_PROXIMITY
+int elliptic_driver_exit(void);
+#endif
 void afe_exit(void);
 void adm_exit(void);
 void adsp_err_exit(void);
