@@ -2408,6 +2408,7 @@
 	};
 
 	jtag_mm0: jtagmm@7040000 {
+		status = "disabled";
 		compatible = "qcom,jtagv8-mm";
 		reg = <0x7040000 0x1000>;
 		reg-names = "etm-base";
@@ -2419,6 +2420,7 @@
 	};
 
 	jtag_mm1: jtagmm@7140000 {
+		status = "disabled";
 		compatible = "qcom,jtagv8-mm";
 		reg = <0x7140000 0x1000>;
 		reg-names = "etm-base";
@@ -2430,6 +2432,7 @@
 	};
 
 	jtag_mm2: jtagmm@7240000 {
+		status = "disabled";
 		compatible = "qcom,jtagv8-mm";
 		reg = <0x7240000 0x1000>;
 		reg-names = "etm-base";
@@ -2441,6 +2444,7 @@
 	};
 
 	jtag_mm3: jtagmm@7340000 {
+		status = "disabled";
 		compatible = "qcom,jtagv8-mm";
 		reg = <0x7340000 0x1000>;
 		reg-names = "etm-base";
@@ -2452,6 +2456,7 @@
 	};
 
 	jtag_mm4: jtagmm@7440000 {
+		status = "disabled";
 		compatible = "qcom,jtagv8-mm";
 		reg = <0x7440000 0x1000>;
 		reg-names = "etm-base";
@@ -2463,6 +2468,7 @@
 	};
 
 	jtag_mm5: jtagmm@7540000 {
+		status = "disabled";
 		compatible = "qcom,jtagv8-mm";
 		reg = <0x7540000 0x1000>;
 		reg-names = "etm-base";
@@ -2474,6 +2480,7 @@
 	};
 
 	jtag_mm6: jtagmm@7640000 {
+		status = "disabled";
 		compatible = "qcom,jtagv8-mm";
 		reg = <0x7640000 0x1000>;
 		reg-names = "etm-base";
@@ -2485,6 +2492,7 @@
 	};
 
 	jtag_mm7: jtagmm@7740000 {
+		status = "disabled";
 		compatible = "qcom,jtagv8-mm";
 		reg = <0x7740000 0x1000>;
 		reg-names = "etm-base";
