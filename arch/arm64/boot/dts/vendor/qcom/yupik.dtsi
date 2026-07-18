@@ -5547,6 +5547,7 @@
 &qupv3_se1_i2c {
 	status = "ok";
 	nq@64 {
+		status = "disabled";
 		compatible = "rtc6226";
 		reg = <0x64>;
 		fmint-gpio = <&tlmm 18 0>;
