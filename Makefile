@@ -1038,6 +1038,9 @@ KBUILD_CFLAGS += -fno-builtin-wcslen
 # change __FILE__ to the relative path from the srctree
 KBUILD_CFLAGS	+= $(call cc-option,-fmacro-prefix-map=$(srctree)/=)
 
+# Disable strict prototype error
+KBUILD_CFLAGS   += $(call cc-option,-Wno-error=strict-prototypes)
+
 include scripts/Makefile.kasan
 include scripts/Makefile.extrawarn
 include scripts/Makefile.ubsan
