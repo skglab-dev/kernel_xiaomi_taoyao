@@ -1041,6 +1041,9 @@ KBUILD_CFLAGS	+= $(call cc-option,-fmacro-prefix-map=$(srctree)/=)
 # Disable strict prototype error
 KBUILD_CFLAGS   += $(call cc-option,-Wno-error=strict-prototypes)
 
+# Disable misleading indentation error
+KBUILD_CFLAGS   += $(call cc-option,-Wno-error=misleading-indentation)
+
 include scripts/Makefile.kasan
 include scripts/Makefile.extrawarn
 include scripts/Makefile.ubsan
