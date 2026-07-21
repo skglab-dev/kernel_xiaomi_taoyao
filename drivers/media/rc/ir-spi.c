@@ -109,11 +109,18 @@ static int ir_spi_set_duty_cycle(struct rc_dev *dev, u32 duty_cycle)
 	return 0;
 }
 
+extern bool cmdline_has_option(const char *key);
+extern int xm_ir_spi_probe(struct spi_device *spi);
+extern int xm_ir_spi_remove(struct spi_device *spi);
+
 static int ir_spi_probe(struct spi_device *spi)
 {
 	int ret;
 	u8 dc;
 	struct ir_spi_data *idata;
+
+	if(cmdline_has_option("xiaomi.ir_spi"))
+		return xm_ir_spi_probe(spi);
 
 	idata = devm_kzalloc(&spi->dev, sizeof(*idata), GFP_KERNEL);
 	if (!idata)
@@ -154,6 +161,9 @@ static int ir_spi_probe(struct spi_device *spi)
 
 static int ir_spi_remove(struct spi_device *spi)
 {
+	if(cmdline_has_option("xiaomi.ir_spi"))
+		return xm_ir_spi_remove(spi);
+
 	return 0;
 }
 

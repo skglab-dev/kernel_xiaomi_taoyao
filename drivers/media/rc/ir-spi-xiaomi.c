@@ -234,7 +234,7 @@ static struct miscdevice ir_spi_dev_drv = {
 	.mode = 0666,
 };
 
-static int ir_spi_probe(struct spi_device *spi)
+int xm_ir_spi_probe(struct spi_device *spi)
 {
 	struct ir_spi_data *idata;
 	u8 *buffer = NULL;
@@ -261,7 +261,7 @@ static int ir_spi_probe(struct spi_device *spi)
 	return 0;
 }
 
-static int ir_spi_remove(struct spi_device *spi)
+int xm_ir_spi_remove(struct spi_device *spi)
 {
 	struct ir_spi_data *idata = spi_get_drvdata(spi);
 	if (idata->buffer != NULL){
@@ -273,7 +273,7 @@ static int ir_spi_remove(struct spi_device *spi)
 	return 0;
 }
 
-static const struct of_device_id ir_spi_of_match[] = {
+/*static const struct of_device_id ir_spi_of_match[] = {
 	{ .compatible = "ir-spi-xiaomi" },
 	{},
 };
@@ -288,7 +288,7 @@ static struct spi_driver ir_spi_driver = {
 	},
 };
 
-module_spi_driver(ir_spi_driver);
+module_spi_driver(ir_spi_driver);*/
 
 MODULE_AUTHOR("Andi Shyti <andi.shyti@samsung.com>");
 MODULE_DESCRIPTION("SPI IR LED");
