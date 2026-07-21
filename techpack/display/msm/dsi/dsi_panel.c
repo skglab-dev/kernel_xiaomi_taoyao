@@ -1747,6 +1747,8 @@ error:
 	return rc;
 }
 
+extern bool cmdline_has_option(const char *key);
+
 static int dsi_panel_parse_phy_props(struct dsi_panel *panel)
 {
 	int rc = 0;
@@ -1756,6 +1758,8 @@ static int dsi_panel_parse_phy_props(struct dsi_panel *panel)
 	struct dsi_parser_utils *utils = &panel->utils;
 	const char *name = panel->name;
 
+	bool xm_displayfeature = cmdline_has_option("xiaomi.displayfeature");
+
 	rc = utils->read_u32(utils->data,
 		  "qcom,mdss-pan-physical-width-dimension", &val);
 	if (rc) {
@@ -1763,7 +1767,7 @@ static int dsi_panel_parse_phy_props(struct dsi_panel *panel)
 		props->panel_width_mm = 0;
 		rc = 0;
 	} else {
-		props->panel_width_mm = val;
+		props->panel_width_mm = xm_displayfeature ? 683 : val;
 	}
 
 	rc = utils->read_u32(utils->data,
@@ -1774,7 +1778,7 @@ static int dsi_panel_parse_phy_props(struct dsi_panel *panel)
 		props->panel_height_mm = 0;
 		rc = 0;
 	} else {
-		props->panel_height_mm = val;
+		props->panel_height_mm = xm_displayfeature ? 1517 : val;
 	}
 
 	str = utils->get_property(utils->data,
