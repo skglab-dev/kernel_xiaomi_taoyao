@@ -3839,6 +3839,11 @@ CHIP_NAME ?= $(MODNAME)
 ccflags-y += -DMULTI_IF_NAME=\"$(CHIP_NAME)\"
 endif
 
+ifeq ($(CONFIG_CNSS_QCA6750), y)
+CHIP_NAME ?= qca6750
+ccflags-y += -DMULTI_IF_NAME=\"$(CHIP_NAME)\"
+endif
+
 endif #DYNAMIC_SINGLE_CHIP
 
 # WLAN_HDD_ADAPTER_MAGIC must be unique for all instances of the driver on the
