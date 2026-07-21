@@ -4,6 +4,14 @@
 #include <linux/proc_fs.h>
 #include <linux/seq_file.h>
 
+bool cmdline_has_option(const char *key)
+{
+	if (!saved_command_line || !key)
+		return false;
+
+	return strstr(saved_command_line, key) != NULL;
+}
+
 static int cmdline_proc_show(struct seq_file *m, void *v)
 {
 	seq_puts(m, saved_command_line);
