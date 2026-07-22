@@ -32,6 +32,8 @@
 
 #include "goodix_ts_core.h"
 
+#include "../xiaomi/xiaomi_touch.h"
+
 #define GOODIX_DEFAULT_CFG_NAME 	"goodix_cfg_group.cfg"
 #define GOOIDX_INPUT_PHYS			"goodix_ts/input0"
 #define PINCTRL_STATE_ACTIVE		"pmx_ts_active"
@@ -1312,6 +1314,7 @@ static void goodix_ts_report_finger(struct input_dev *dev,
 			goodix_core_data->fod_finger = true;
 			input_report_key(dev, BTN_INFO, 1);
 			input_sync(dev);
+			update_fod_press_status(1);
 			ts_info("fod finger is %d",goodix_core_data->fod_finger);
 			goto finger_pos;
 	} else if ((goodix_core_data->eventsdata & 0x08) != 0x08 && goodix_core_data->fod_finger) {
@@ -1320,6 +1323,7 @@ static void goodix_ts_report_finger(struct input_dev *dev,
 			input_report_abs(dev, ABS_MT_WIDTH_MAJOR, 0);
 			input_report_abs(dev, ABS_MT_WIDTH_MINOR, 0);
 			input_sync(dev);
+			update_fod_press_status(0);
 			goodix_core_data->fod_finger = false;
 			ts_info("fod finger is %d",goodix_core_data->fod_finger);
 			goto finger_pos;
@@ -2749,6 +2753,7 @@ static ssize_t goodix_ts_fod_test_store(struct device *dev,
     sscanf(buf, "%u", &value);
     if (value) {
         input_report_key(info->input_dev, BTN_INFO, 1);
+		update_fod_press_status(1);
         input_sync(info->input_dev);
         input_mt_slot(info->input_dev, 0);
         input_mt_report_slot_state(info->input_dev, MT_TOOL_FINGER, 1);
@@ -2765,6 +2770,7 @@ static ssize_t goodix_ts_fod_test_store(struct device *dev,
         input_mt_report_slot_state(info->input_dev, MT_TOOL_FINGER, 0);
         input_report_abs(info->input_dev, ABS_MT_TRACKING_ID, -1);
         input_report_key(info->input_dev, BTN_INFO, 0);
+		update_fod_press_status(0);
         input_sync(info->input_dev);
     }
     return count;
