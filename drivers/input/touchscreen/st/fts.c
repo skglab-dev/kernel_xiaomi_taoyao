@@ -1420,6 +1420,7 @@ void release_all_touches(struct fts_ts_info *info)
 		input_report_abs(info->input_dev, ABS_MT_TRACKING_ID, -1);
 	}
 	input_sync(info->input_dev);
+	update_fod_press_status(0);
 	info->touch_id = 0;
 #ifdef STYLUS_MODE
 	info->stylus_id = 0;
