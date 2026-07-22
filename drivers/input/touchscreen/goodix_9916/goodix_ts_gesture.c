@@ -27,6 +27,7 @@
 #include <linux/atomic.h>
 #include <linux/input/mt.h>
 #include "goodix_ts_core.h"
+#include "../xiaomi/xiaomi_touch.h"
 
 #define QUERYBIT(longlong, bit) (!!(longlong[bit/8] & (1 << bit%8)))
 
@@ -285,6 +286,7 @@ static int gsx_gesture_ist(struct goodix_ts_core *cd,
 			input_report_abs(cd->input_dev, ABS_MT_WIDTH_MINOR,overlay_area);
 			input_sync(cd->input_dev);
 			mi_disp_set_fod_queue_work(1, true);
+			update_fod_press_status(1);
 			cd->fod_finger = true;
 			FP_Event_Gesture = 0;
 			goto re_send_ges_cmd;
@@ -308,6 +310,7 @@ static int gsx_gesture_ist(struct goodix_ts_core *cd,
 			input_report_key(cd->input_dev, BTN_TOOL_FINGER, 0);
 			input_sync(cd->input_dev);
 			mi_disp_set_fod_queue_work(0, true);
+			update_fod_press_status(0);
 		}
 		goto re_send_ges_cmd;
 	}
