@@ -88,6 +88,7 @@ struct xiaomi_touch {
 	struct mutex  mutex;
 	struct mutex  palm_mutex;
 	struct mutex  prox_mutex;
+	struct mutex  fod_press_status_mutex;
 	wait_queue_head_t 	wait_queue;
 };
 
@@ -126,6 +127,7 @@ struct xiaomi_touch_pdata{
 	int prox_value;
 	bool prox_changed;
 	const char *name;
+	int fod_press_status_value;
 	struct proc_dir_entry  *last_touch_events_proc;
 	struct last_touch_event *last_touch_events;
 };
@@ -145,6 +147,8 @@ extern int xiaomitouch_register_modedata(int touchId, struct xiaomi_touch_interf
 extern int copy_touch_rawdata(char *raw_base,  int len);
 
 extern int update_touch_rawdata(void);
+
+extern int update_fod_press_status(int value);
 
 extern int update_clicktouch_raw(void);
 
