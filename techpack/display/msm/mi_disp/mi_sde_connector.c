@@ -445,7 +445,8 @@ int mi_sde_connector_fod_hbm_fence(struct drm_connector *connector)
 
 	mi_cfg = &dsi_display->panel->mi_cfg;
 
-	if (mi_cfg->panel_id == 0x4B394400360200 || mi_cfg->panel_id == 0x4B394400420d00) {
+	if (mi_cfg->panel_id == 0x4C3900360200 || mi_cfg->panel_id == 0x4C3900420200 || 
+		mi_cfg->panel_id == 0x4B394400360200 || mi_cfg->panel_id == 0x4B394400420d00) {
 		if (!(c_conn->mi_layer_state.mi_layer_type & MI_DIMLAYER_AOD)) {
 			if (c_conn->lp_mode == SDE_MODE_DPMS_ON)
 				mi_cfg->bl_enable = true;
