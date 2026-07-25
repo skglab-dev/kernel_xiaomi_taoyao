@@ -40,6 +40,8 @@
 #define HIGH_REFRESH_RATE_THRESHOLD_TIME_US	500
 #define MIN_PREFILL_LINES      40
 
+extern bool cmdline_has_option(const char *key);
+
 static void dsi_dce_prepare_pps_header(char *buf, u32 pps_delay_ms)
 {
 	char *bp;
@@ -655,6 +657,67 @@ error:
 	return rc;
 }
 
+static int dsi_panel_set_doze(struct dsi_panel *panel, bool status)
+{
+	int rc = 0;
+
+	if (!panel->bl_config.allow_bl_update)
+		return 0;
+
+	panel->doze_mode_requested = DSI_DOZE_MODE_NOLP;
+	if (status){
+		panel->doze_mode_requested = (panel->bl_config.real_bl_level > 100) ?
+			DSI_DOZE_MODE_LP_HBM : DSI_DOZE_MODE_LP_LBM;
+	}
+
+	if (panel->doze_mode_active == panel->doze_mode_requested) {
+		DSI_INFO("[%s] active doze mode is equal to requested mode: %d\n",
+			 panel->name, panel->doze_mode_active);
+		return 0;
+	}
+
+	switch (panel->doze_mode_requested) {
+	case DSI_DOZE_MODE_NOLP:
+		switch (panel->doze_mode_active) {
+		case DSI_DOZE_MODE_LP_LBM:
+			DSI_INFO("Leaving doze LBM");
+			rc = dsi_panel_tx_cmd_set(panel, DSI_CMD_SET_MI_DOZE_LBM_NOLP);
+			if (rc)
+				DSI_ERR("[%s] failed to send DSI_CMD_SET_MI_DOZE_LBM_NOLP cmd, rc=%d\n",
+					panel->name, rc);
+			break;
+		case DSI_DOZE_MODE_LP_HBM:
+			DSI_INFO("Leaving doze HBM");
+			rc = dsi_panel_tx_cmd_set(panel, DSI_CMD_SET_MI_DOZE_HBM_NOLP);
+			if (rc)
+				DSI_ERR("[%s] failed to send DSI_CMD_SET_MI_DOZE_HBM_NOLP cmd, rc=%d\n",
+					panel->name, rc);
+			break;
+		default:
+			break;
+		}
+		break;
+	case DSI_DOZE_MODE_LP_LBM:
+		DSI_INFO("Entering doze LBM");
+		rc = dsi_panel_tx_cmd_set(panel, DSI_CMD_SET_MI_DOZE_LBM);
+		if (rc)
+			DSI_ERR("[%s] failed to send DSI_CMD_SET_MI_DOZE_LBM cmd, rc=%d\n",
+				panel->name, rc);
+		break;
+	case DSI_DOZE_MODE_LP_HBM:
+		DSI_INFO("Entering doze HBM");
+		rc = dsi_panel_tx_cmd_set(panel, DSI_CMD_SET_MI_DOZE_HBM);
+		if (rc)
+			DSI_ERR("[%s] failed to send DSI_CMD_SET_MI_DOZE_HBM cmd, rc=%d\n",
+				panel->name, rc);
+		break;
+	}
+
+	panel->doze_mode_active = panel->doze_mode_requested;
+
+	return rc;
+}
+
 int dsi_panel_set_backlight(struct dsi_panel *panel, u32 bl_lvl)
 {
 	int rc = 0;
@@ -693,6 +756,8 @@ int dsi_panel_set_backlight(struct dsi_panel *panel, u32 bl_lvl)
 		DSI_ERR("Backlight type(%d) not supported\n", bl->type);
 		rc = -ENOTSUPP;
 	}
+
+	bl->real_bl_level = bl_lvl;
 
 	panel->mi_cfg.bl_need_update = false;
 	rc = mi_dsi_panel_update_dc_status(panel, bl_lvl);
@@ -1747,8 +1812,6 @@ error:
 	return rc;
 }
 
-extern bool cmdline_has_option(const char *key);
-
 static int dsi_panel_parse_phy_props(struct dsi_panel *panel)
 {
 	int rc = 0;
@@ -2602,6 +2665,7 @@ static int dsi_panel_parse_bl_config(struct dsi_panel *panel)
 
 	panel->bl_config.bl_scale = MAX_BL_SCALE_LEVEL;
 	panel->bl_config.bl_scale_sv = MAX_SV_BL_SCALE_LEVEL;
+	panel->bl_config.real_bl_level = 0;
 
 	rc = utils->read_u32(utils->data, "qcom,mdss-dsi-bl-min-level", &val);
 	if (rc) {
@@ -4562,19 +4626,25 @@ int dsi_panel_set_lp1(struct dsi_panel *panel)
 		dsi_pwr_panel_regulator_mode_set(&panel->power_info,
 			"ibb", REGULATOR_MODE_IDLE);
 
-	if (panel->mi_cfg.aod_bl_51ctl &&
-		panel->power_mode == SDE_MODE_DPMS_LP2) {
-		mi_disp_handle_lp_event(panel, SDE_MODE_DPMS_LP1);
-		DISP_UTC_INFO("LP2 status, doesn't switch aod status\n");
+	if(!cmdline_has_option("xiaomi.displayfeature")) {
+		rc = dsi_panel_set_doze(panel, true);
+		if (rc)
+			DSI_ERR("[%s] unable to set doze on, rc=%d\n", panel->name, rc);
 	} else {
-		rc = dsi_panel_tx_cmd_set(panel, DSI_CMD_SET_LP1);
-		if (rc) {
-			DSI_ERR("[%s] failed to send DSI_CMD_SET_LP1 cmd, rc=%d\n",
-			       panel->name, rc);
-		} else {
+		if (panel->mi_cfg.aod_bl_51ctl &&
+			panel->power_mode == SDE_MODE_DPMS_LP2) {
 			mi_disp_handle_lp_event(panel, SDE_MODE_DPMS_LP1);
-			if (panel->mi_cfg.panel_id == 0x4B394200420200 || panel->mi_cfg.panel_id == 0x4B394500420200 || panel->mi_cfg.panel_id == 0x4B394500350200)
-				panel->mi_cfg.aod_brightness_work_flag = true;
+			DISP_UTC_INFO("LP2 status, doesn't switch aod status\n");
+		} else {
+			rc = dsi_panel_tx_cmd_set(panel, DSI_CMD_SET_LP1);
+			if (rc) {
+				DSI_ERR("[%s] failed to send DSI_CMD_SET_LP1 cmd, rc=%d\n",
+					panel->name, rc);
+			} else {
+				mi_disp_handle_lp_event(panel, SDE_MODE_DPMS_LP1);
+				if (panel->mi_cfg.panel_id == 0x4B394200420200 || panel->mi_cfg.panel_id == 0x4B394500420200 || panel->mi_cfg.panel_id == 0x4B394500350200)
+					panel->mi_cfg.aod_brightness_work_flag = true;
+			}
 		}
 	}
 
@@ -4602,10 +4672,17 @@ int dsi_panel_set_lp2(struct dsi_panel *panel)
 	if (!panel->panel_initialized)
 		goto exit;
 
-	rc = dsi_panel_tx_cmd_set(panel, DSI_CMD_SET_LP2);
-	if (rc)
-		DSI_ERR("[%s] failed to send DSI_CMD_SET_LP2 cmd, rc=%d\n",
-		       panel->name, rc);
+	if(!cmdline_has_option("xiaomi.displayfeature")) {
+		rc = dsi_panel_set_doze(panel, false);
+		if (rc)
+			DSI_ERR("[%s] unable to set doze off, rc=%d\n", panel->name, rc);
+	} else {
+		rc = dsi_panel_tx_cmd_set(panel, DSI_CMD_SET_LP2);
+		if (rc)
+			DSI_ERR("[%s] failed to send DSI_CMD_SET_LP2 cmd, rc=%d\n",
+				panel->name, rc);
+	}
+
 exit:
 	mi_dsi_update_micfg_flags(panel, PANEL_LP2);
 	mutex_unlock(&panel->panel_lock);
@@ -5172,6 +5249,8 @@ int dsi_panel_disable(struct dsi_panel *panel)
 	}
 	panel->panel_initialized = false;
 	panel->power_mode = SDE_MODE_DPMS_OFF;
+	panel->doze_mode_active = DSI_DOZE_MODE_NOLP;
+	panel->doze_mode_requested = DSI_DOZE_MODE_NOLP;
 	mi_dsi_update_micfg_flags(panel, PANEL_OFF);
 
 	mutex_unlock(&panel->panel_lock);
