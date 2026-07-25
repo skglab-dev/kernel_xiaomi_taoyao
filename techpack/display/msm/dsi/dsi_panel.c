@@ -5134,25 +5134,24 @@ int dsi_panel_disable(struct dsi_panel *panel)
 
 	/* Avoid sending panel off commands when ESD recovery is underway */
 	if (!atomic_read(&panel->esd_recovery_pending)) {
-		/*
-		 * Need to set IBB/AB regulator mode to STANDBY,
-		 * if panel is going off from AOD mode.
-		 */
-		if (dsi_panel_is_type_oled(panel) &&
-			(panel->power_mode == SDE_MODE_DPMS_LP1 ||
-			panel->power_mode == SDE_MODE_DPMS_LP2))
-			dsi_pwr_panel_regulator_mode_set(&panel->power_info,
-				"ibb", REGULATOR_MODE_STANDBY);
+		if (panel->power_mode == SDE_MODE_DPMS_LP1 ||
+		    panel->power_mode == SDE_MODE_DPMS_LP2) {
+			/*
+			 * Need to set IBB/AB regulator mode to STANDBY,
+			 * if panel is going off from AOD mode.
+			 */
+			if (dsi_panel_is_type_oled(panel))
+				dsi_pwr_panel_regulator_mode_set(&panel->power_info, "ibb",
+								 REGULATOR_MODE_STANDBY);
 
-		if (panel->mi_cfg.doze_to_off_command_enabled &&
-			(panel->power_mode == SDE_MODE_DPMS_LP1 ||
-			panel->power_mode == SDE_MODE_DPMS_LP2)) {
-			rc = dsi_panel_tx_cmd_set(panel, DSI_CMD_SET_MI_PRE_DOZE_TO_OFF);
-			if (rc)
-				DISP_ERROR("[%s] failed to send DSI_CMD_SET_MI_RRE_DOZE_TO_OFF cmds, rc=%d\n",
-					panel->name, rc);
-			else
-				DISP_INFO("%s panel: DSI_CMD_SET_MI_PRE_DOZE_TO_OFF\n", panel->type);
+			if(panel->mi_cfg.doze_to_off_command_enabled) {
+				rc = dsi_panel_tx_cmd_set(panel, DSI_CMD_SET_MI_PRE_DOZE_TO_OFF);
+				if (rc)
+					DISP_ERROR("[%s] failed to send DSI_CMD_SET_MI_RRE_DOZE_TO_OFF cmds, rc=%d\n",
+						panel->name, rc);
+				else
+					DISP_INFO("%s panel: DSI_CMD_SET_MI_PRE_DOZE_TO_OFF\n", panel->type);
+			}
 		}
 
 		rc = dsi_panel_tx_cmd_set(panel, DSI_CMD_SET_OFF);
