@@ -23,6 +23,7 @@
 #include "dsi_pwr.h"
 #include "sde_dbg.h"
 #include "dsi_parser.h"
+#include <video/mipi_display.h>
 #include "mi_dsi_display.h"
 
 #define to_dsi_display(x) container_of(x, struct dsi_display, host)
@@ -3413,9 +3414,13 @@ static ssize_t dsi_host_transfer(struct mipi_dsi_host *host,
 				(display->enabled))
 			cmd_flags |= DSI_CTRL_CMD_CUSTOM_DMA_SCHED;
 
+		if (msg->type == MIPI_DSI_DCS_READ)
+			cmd_flags |= DSI_CTRL_CMD_READ;
+
 		rc = dsi_ctrl_cmd_transfer(display->ctrl[ctrl_idx].ctrl, msg,
 				&cmd_flags);
-		if (rc < 0) {
+		if ((msg->type == MIPI_DSI_DCS_READ && rc == 0) || 
+			(msg->type != MIPI_DSI_DCS_READ && rc)) {
 			DSI_ERR("[%s] cmd transfer failed, rc=%d\n",
 			       display->name, rc);
 			goto error_disable_cmd_engine;
