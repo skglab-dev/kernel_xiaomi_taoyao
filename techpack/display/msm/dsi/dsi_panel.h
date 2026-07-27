@@ -21,6 +21,8 @@
 #include "dsi_parser.h"
 #include "msm_drv.h"
 
+#include "mi_dsi_panel.h"
+
 #define MAX_BL_LEVEL 4096
 #define MAX_BL_SCALE_LEVEL 1024
 #define MAX_SV_BL_SCALE_LEVEL 65535
@@ -272,6 +274,7 @@ struct dsi_panel {
 	int panel_test_gpio;
 	int power_mode;
 	enum dsi_panel_physical_type panel_type;
+	struct mi_dsi_panel_cfg mi_cfg;
 
 	struct dsi_tlmm_gpio *tlmm_gpio;
 	u32 tlmm_gpio_count;
@@ -280,6 +283,10 @@ struct dsi_panel {
 
 	enum dsi_doze_mode_type doze_mode_active;
 	enum dsi_doze_mode_type doze_mode_requested;
+
+	bool fod_hbm_enabled;
+	bool fod_hbm_requested;
+	bool fod_ui;
 };
 
 static inline bool dsi_panel_ulps_feature_enabled(struct dsi_panel *panel)
@@ -415,4 +422,9 @@ int dsi_panel_create_cmd_packets(const char *data, u32 length, u32 count,
 void dsi_panel_destroy_cmd_packets(struct dsi_panel_cmd_set *set);
 
 void dsi_panel_dealloc_cmd_packets(struct dsi_panel_cmd_set *set);
+
+int dsi_panel_is_fod_hbm_applied(struct dsi_panel *panel);
+int dsi_panel_get_fod_hbm(struct dsi_panel *panel);
+int dsi_panel_apply_requested_fod_hbm(struct dsi_panel *panel);
+void dsi_panel_set_fod_ui(struct dsi_panel *panel, bool status);
 #endif /* _DSI_PANEL_H_ */
