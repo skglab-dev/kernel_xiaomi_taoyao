@@ -44,8 +44,6 @@
 #include "sde_encoder_dce.h"
 #include "sde_vm.h"
 
-#include "mi_sde_encoder.h"
-
 #define SDE_DEBUG_ENC(e, fmt, ...) SDE_DEBUG("enc%d " fmt,\
 		(e) ? (e)->base.base.id : -1, ##__VA_ARGS__)
 
@@ -271,20 +269,12 @@ static int _sde_encoder_wait_timeout(int32_t drm_id, int32_t hw_id,
 
 	return rc;
 }
+
 u32 sde_encoder_get_display_type(struct drm_encoder *drm_enc)
 {
 	struct sde_encoder_virt *sde_enc = to_sde_encoder_virt(drm_enc);
 
 	return sde_enc ? sde_enc->disp_info.display_type : 0;
-}
-
-bool sde_encoder_is_primary_display(struct drm_encoder *drm_enc)
-{
-	struct sde_encoder_virt *sde_enc = to_sde_encoder_virt(drm_enc);
-
-	return sde_enc &&
-		(sde_enc->disp_info.display_type ==
-		SDE_CONNECTOR_PRIMARY);
 }
 
 bool sde_encoder_is_dsi_display(struct drm_encoder *drm_enc)
@@ -4291,8 +4281,6 @@ void sde_encoder_kickoff(struct drm_encoder *drm_enc, bool is_error,
 	sde_enc = to_sde_encoder_virt(drm_enc);
 
 	SDE_DEBUG_ENC(sde_enc, "\n");
-
-	mi_sde_encoder_calc_fps(drm_enc);
 
 	/* create a 'no pipes' commit to release buffers on errors */
 	if (is_error)

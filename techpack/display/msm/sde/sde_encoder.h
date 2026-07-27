@@ -262,8 +262,6 @@ struct sde_encoder_virt {
 	struct cpumask valid_cpu_mask;
 	struct msm_mode_info mode_info;
 	bool delay_kickoff;
-	bool prepare_kickoff;
-	bool ready_kickoff;
 };
 
 #define to_sde_encoder_virt(x) container_of(x, struct sde_encoder_virt, base)
@@ -524,14 +522,6 @@ void sde_encoder_set_clone_mode(struct drm_encoder *drm_enc,
  */
 bool sde_encoder_is_cwb_disabling(struct drm_encoder *drm_enc,
 	struct drm_crtc *drm_crtc);
-
-/**
- * sde_encoder_is_primary_display - checks if underlying display is primary
- *     display or not.
- * @drm_enc:    Pointer to drm encoder structure
- * @Return:     true if it is primary display. false if secondary display
- */
-bool sde_encoder_is_primary_display(struct drm_encoder *enc);
 
 /**
  * sde_encoder_get_display_type - returns the display_type of underlying
