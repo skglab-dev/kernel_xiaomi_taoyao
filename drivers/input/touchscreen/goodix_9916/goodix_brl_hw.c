@@ -276,18 +276,11 @@ int brl_gesture(struct goodix_ts_core *cd, int gesture_type)
 	cmd.data[0] = 0x80;
 	cmd.data[1] = 0x10;
 
-	if((cd->fod_icon_status) || (cd->aod_status)){
-		cmd.data[0] = 0x80;
-		cmd.data[1] = 0x00;
-	}
 	if (cd->double_wakeup){
 		cmd.data[0] = 0x00;
 		cmd.data[1] = 0x10;
 	}
-	if(((cd->fod_icon_status) || (cd->aod_status)) && (cd->double_wakeup)){
-		cmd.data[0] = 0x00;
-		cmd.data[1] = 0x00;
-	}
+
 	ts_info("BRL cmd 0 is 0x%x",cmd.data[0]);
 	ts_info("BRL cmd 1 is 0x%x",cmd.data[1]);
 	if (cd->hw_ops->send_cmd(cd, &cmd))

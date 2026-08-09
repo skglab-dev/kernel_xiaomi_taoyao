@@ -824,39 +824,6 @@ static ssize_t goodix_ts_aod_store(struct device *dev,
 	return count;
 }
 
-/* fod gesture show */
-static ssize_t goodix_ts_fod_show(struct device *dev,
-				struct device_attribute *attr, char *buf)
-{
-	int r = 0;
-
-	r = snprintf(buf, PAGE_SIZE, "state:%s\n",
-			goodix_core_data->fod_status ?
-			"enabled" : "disabled");
-
-	return r;
-}
-
-/* fod gesture_store */
-static ssize_t goodix_ts_fod_store(struct device *dev,
-					struct device_attribute *attr,
-					const char *buf, size_t count)
-{
-	if (!buf || count <= 0)
-		return -EINVAL;
-
-	if (buf[0] != '0') {
-		goodix_core_data->fod_status = 1;
-		queue_work(goodix_core_data->gesture_wq, &goodix_core_data->gesture_work);
-	}
-	else {
-		goodix_core_data->fod_status = 0;
-		queue_work(goodix_core_data->gesture_wq, &goodix_core_data->gesture_work);
-	}
-	return count;
-}
-
-
 /* report_rate show */
 static ssize_t goodix_report_rate_show(struct device *dev,
 				struct device_attribute *attr, char *buf)
@@ -901,7 +868,6 @@ static DEVICE_ATTR(debug_log, 0664, goodix_ts_debug_log_show, goodix_ts_debug_lo
 static DEVICE_ATTR(double_tap_enable, 0664, goodix_ts_double_tap_show, goodix_ts_double_tap_store);
 static DEVICE_ATTR(aod_enable, 0664, goodix_ts_aod_show, goodix_ts_aod_store);
 static DEVICE_ATTR(switch_report_rate, 0664, goodix_report_rate_show, goodix_report_rate_store);
-static DEVICE_ATTR(fod_enable, 0664, goodix_ts_fod_show, goodix_ts_fod_store);
 
 static struct attribute *sysfs_attrs[] = {
 	&dev_attr_driver_info.attr,
@@ -916,7 +882,6 @@ static struct attribute *sysfs_attrs[] = {
 	&dev_attr_double_tap_enable.attr,
 	&dev_attr_aod_enable.attr,
 	&dev_attr_switch_report_rate.attr,
-	&dev_attr_fod_enable.attr,
 	NULL,
 };
 
@@ -1309,26 +1274,22 @@ static void goodix_ts_report_finger(struct input_dev *dev,
 	int report_y;
 
 	mutex_lock(&dev->mutex);
+#if 0
 	if ((goodix_core_data->eventsdata & 0x08) && (goodix_core_data->fod_status != 0 && goodix_core_data->fod_status != -1) && (!goodix_core_data->fod_finger)) {
 			ts_info("fod down");
 			goodix_core_data->fod_finger = true;
-			input_report_key(dev, BTN_INFO, 1);
-			input_sync(dev);
 			update_fod_press_status(1);
 			ts_info("fod finger is %d",goodix_core_data->fod_finger);
 			goto finger_pos;
 	} else if ((goodix_core_data->eventsdata & 0x08) != 0x08 && goodix_core_data->fod_finger) {
 			ts_info("ts fod up");
-			input_report_key(dev, BTN_INFO, 0);
-			input_report_abs(dev, ABS_MT_WIDTH_MAJOR, 0);
-			input_report_abs(dev, ABS_MT_WIDTH_MINOR, 0);
-			input_sync(dev);
 			update_fod_press_status(0);
 			goodix_core_data->fod_finger = false;
 			ts_info("fod finger is %d",goodix_core_data->fod_finger);
 			goto finger_pos;
 		}
 finger_pos:
+#endif
 	for (i = 0; i < GOODIX_MAX_TOUCH; i++) {
 		if (touch_data->coords[i].status == TS_TOUCH) {
 			/*
@@ -1353,12 +1314,6 @@ finger_pos:
 					report_x);
 			input_report_abs(dev, ABS_MT_POSITION_Y,
 					report_y);
-	if ((goodix_core_data->eventsdata & 0x08) != 0x08 || !goodix_core_data->fod_status)
-		touch_data->overlay = 0;
-	input_report_abs(dev, ABS_MT_WIDTH_MAJOR,
-					touch_data->overlay);
-	input_report_abs(dev, ABS_MT_WIDTH_MINOR,
-					touch_data->overlay);
 #ifdef GOODIX_XIAOMI_TOUCHFEATURE
 			last_touch_events_collect(i, 1);
 #endif
@@ -2742,42 +2697,6 @@ int goodix_ts_get_lockdown_info(struct goodix_ts_core *cd)
 	return 0;
 }
 
-static ssize_t goodix_ts_fod_test_store(struct device *dev,
-                     struct device_attribute *attr,
-                     const char *buf, size_t count)
-{
-    int value = 0;
-    struct goodix_ts_core *info = dev_get_drvdata(dev);
-
-    ts_info("%s,buf:%s,count:%u\n",__func__, buf, count);
-    sscanf(buf, "%u", &value);
-    if (value) {
-        input_report_key(info->input_dev, BTN_INFO, 1);
-		update_fod_press_status(1);
-        input_sync(info->input_dev);
-        input_mt_slot(info->input_dev, 0);
-        input_mt_report_slot_state(info->input_dev, MT_TOOL_FINGER, 1);
-        input_report_key(info->input_dev, BTN_TOUCH, 1);
-        input_report_key(info->input_dev, BTN_TOOL_FINGER, 1);
-        input_report_abs(info->input_dev, ABS_MT_TRACKING_ID, 0);
-        input_report_abs(info->input_dev, ABS_MT_WIDTH_MINOR, 1);
-        input_report_abs(info->input_dev, ABS_MT_POSITION_X, 5400);
-        input_report_abs(info->input_dev, ABS_MT_POSITION_Y, 21490);
-        input_sync(info->input_dev);
-    } else {
-        input_mt_slot(info->input_dev, 0);
-        input_report_abs(info->input_dev, ABS_MT_WIDTH_MINOR, 0);
-        input_mt_report_slot_state(info->input_dev, MT_TOOL_FINGER, 0);
-        input_report_abs(info->input_dev, ABS_MT_TRACKING_ID, -1);
-        input_report_key(info->input_dev, BTN_INFO, 0);
-		update_fod_press_status(0);
-        input_sync(info->input_dev);
-    }
-    return count;
-}
-
-static DEVICE_ATTR(fod_test, (S_IRUGO | S_IWUSR | S_IWGRP), NULL, goodix_ts_fod_test_store);
-
 #ifdef GOODIX_XIAOMI_TOUCHFEATURE
 static struct xiaomi_touch_interface xiaomi_touch_interfaces;
 /*
@@ -2790,10 +2709,8 @@ static void goodix_set_gesture_work(struct work_struct *work)
 		container_of(work, struct goodix_ts_core, gesture_work);
 	ts_debug("double is 0x%x",core_data->double_wakeup);
 	ts_debug("aod is 0x%x",core_data->aod_status);
-	ts_debug("fod is 0x%x",core_data->fod_status);
 	ts_debug("enable is 0x%x",core_data->gesture_enabled);
-	if((core_data->double_wakeup) || (core_data->aod_status) ||
-				(core_data->fod_status != -1 && core_data->fod_status != 100))
+	if((core_data->double_wakeup) || (core_data->aod_status))
 		core_data->gesture_enabled |= (1 << 0);
 	else
 		core_data->gesture_enabled &= ~(1 << 0);
@@ -2895,18 +2812,6 @@ static int goodix_set_cur_value(int gtp_mode, int gtp_value)
 	}
 	if (gtp_mode == Touch_Aod_Enable && goodix_core_data && gtp_value >= 0) {
 		goodix_core_data->aod_status = gtp_value;
-		queue_work(goodix_core_data->gesture_wq, &goodix_core_data->gesture_work);
-		return 0;
-	}
-	if (gtp_mode ==  Touch_Fod_Enable && goodix_core_data && gtp_value >= 0) {
-		goodix_core_data->fod_status = gtp_value;
-		ts_info("Touch_Fod_Enable value [%d]\n",gtp_value );
-		queue_work(goodix_core_data->gesture_wq, &goodix_core_data->gesture_work);
-		return 0;
-	}
-	if (gtp_mode ==  Touch_FodIcon_Enable && goodix_core_data && gtp_value >= 0) {
-		goodix_core_data->fod_icon_status = gtp_value;
-		ts_info("Touch_FodIcon_Enable value [%d]\n",gtp_value );
 		queue_work(goodix_core_data->gesture_wq, &goodix_core_data->gesture_work);
 		return 0;
 	}
@@ -3339,10 +3244,6 @@ static int goodix_ts_probe(struct platform_device *pdev)
                 goto err_class_create;
             }
             dev_set_drvdata(core_data->goodix_touch_dev, core_data);
-            if (sysfs_create_file(&core_data->goodix_touch_dev->kobj, &dev_attr_fod_test.attr)) {
-                ts_err("Failed to create fod_test sysfs group!\n");
-                goto err_class_create;
-            }
         }
     }
 
@@ -3372,11 +3273,6 @@ static int goodix_ts_probe(struct platform_device *pdev)
 	/* debug node init */
 	goodix_tools_init();
 	core_data->tp_pm_suspend = false;
-#ifdef CONFIG_FACTORY_BUILD
-	core_data->fod_status = 1;
-#else
-	core_data->fod_status = -1;
-#endif
 	init_completion(&core_data->pm_resume_completion);
 	device_init_wakeup(&pdev->dev, 1);
 	core_data->init_stage = CORE_INIT_STAGE1;
