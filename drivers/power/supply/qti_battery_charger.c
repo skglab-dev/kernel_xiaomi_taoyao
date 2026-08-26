@@ -1670,8 +1670,6 @@ static int battery_psy_set_charge_current(struct battery_chg_dev *bcdev,
 {
 	int rc;
 //	u32 fcc_ua, prev_fcc_ua;
-	if(val == bcdev->curr_thermal_level)
-	      return 0;
 	pr_err("set thermal-level: %d num_thermal_levels: %d \n", val, bcdev->num_thermal_levels);
 
 	if (!bcdev->num_thermal_levels)
