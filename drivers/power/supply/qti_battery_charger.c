@@ -4979,7 +4979,7 @@ static ssize_t typec_mode_show(struct class *c,
 	int rc;
 
 	rc = read_property_id(bcdev, pst, XM_PROP_TYPEC_MODE);
-	if (rc < 0 || pst->prop[XM_PROP_TYPEC_MODE] > 9 || pst->prop[XM_PROP_TYPEC_MODE] < 0)
+	if (rc < 0)
 		return rc;
 
 	return scnprintf(buf, PAGE_SIZE, "%s\n", power_supply_usbc_text[pst->prop[XM_PROP_TYPEC_MODE]]);
