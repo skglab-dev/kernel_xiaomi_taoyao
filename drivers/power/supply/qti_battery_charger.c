@@ -452,7 +452,6 @@ struct battery_chg_dev {
 	u32				*thermal_levels;
 	const char			*wls_fw_name;
 	int				curr_thermal_level;
-	int				curr_wlsthermal_level;
 	int				num_thermal_levels;
 	atomic_t			state;
 	struct work_struct		subsys_up_work;
@@ -4031,9 +4030,6 @@ static ssize_t wlscharge_control_limit_store(struct class *c,
 	if (kstrtoint(buf, 10, &val))
 		return -EINVAL;
 
-	if(val == bcdev->curr_wlsthermal_level)
-		  return count;
-
 	pr_err("set thermal-level: %d num_thermal_levels: %d \n", val, bcdev->num_thermal_levels);
 
 	if (bcdev->num_thermal_levels <= 0) {
@@ -4048,8 +4044,6 @@ static ssize_t wlscharge_control_limit_store(struct class *c,
 				XM_PROP_WLSCHARGE_CONTROL_LIMIT, val);
 	if (rc < 0)
 		return rc;
-
-	bcdev->curr_wlsthermal_level = val;
 
 	return count;
 }
