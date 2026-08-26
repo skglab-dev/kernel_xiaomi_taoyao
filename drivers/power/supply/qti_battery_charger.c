@@ -5514,20 +5514,18 @@ static void generate_xm_charge_uvent(struct work_struct *work)
 		"POWER_SUPPLY_SOC_DECIMAL=\n",	//length=31+8
 		"POWER_SUPPLY_SOC_DECIMAL_RATE=\n",	//length=31+8
 		"POWER_SUPPLY_SHUTDOWN_DELAY=\n",//28+8
-		"POWER_SUPPLY_VBUS_DISABLE=\n",//length=26+1
 	};
 	static char *envp[] = {
 		uevent_string[0],
 		uevent_string[1],
 		uevent_string[2],
-		uevent_string[3],
 #if defined(CONFIG_MI_WIRELESS)
+		uevent_string[3],
 		uevent_string[4],
 		uevent_string[5],
 		uevent_string[6],
 		uevent_string[7],
 		uevent_string[8],
-		uevent_string[9],
 #endif
 		NULL,
 
@@ -5567,11 +5565,8 @@ static void generate_xm_charge_uvent(struct work_struct *work)
 	shutdown_delay_show( &(bcdev->battery_class), NULL, prop_buf);
 	strncpy( uevent_string[8]+28, prop_buf,MAX_UEVENT_LENGTH-28);
 
-	vbus_disable_show( &(bcdev->battery_class), NULL, prop_buf);
-	strncpy( uevent_string[9]+26, prop_buf,MAX_UEVENT_LENGTH-26);
-
-	dev_err(bcdev->dev,"uevent test : %s\n %s\n %s\n %s\n %s\n %s\n %s\n %s\n %s\n %s\n",
-			envp[0], envp[1], envp[2], envp[3], envp[4],envp[5], envp[6],envp[7],envp[8],envp[9]);
+	dev_err(bcdev->dev,"uevent test : %s\n %s\n %s\n %s\n %s\n %s\n %s\n %s\n %s\n",
+			envp[0], envp[1], envp[2], envp[3], envp[4],envp[5], envp[6],envp[7],envp[8]);
 #else
 	soc_decimal_show( &(bcdev->battery_class), NULL, prop_buf);
 	strncpy( uevent_string[0]+25, prop_buf,MAX_UEVENT_LENGTH-25);
@@ -5582,11 +5577,8 @@ static void generate_xm_charge_uvent(struct work_struct *work)
 	shutdown_delay_show( &(bcdev->battery_class), NULL, prop_buf);
 	strncpy( uevent_string[2]+28, prop_buf,MAX_UEVENT_LENGTH-28);
 
-	vbus_disable_show( &(bcdev->battery_class), NULL, prop_buf);
-	strncpy( uevent_string[3]+26, prop_buf,MAX_UEVENT_LENGTH-26);
-
-	dev_err(bcdev->dev,"uevent test : %s\n %s\n %s\n %s\n",
-			envp[0], envp[1], envp[2],envp[3]);
+	dev_err(bcdev->dev,"uevent test : %s\n %s\n %s\n",
+			envp[0], envp[1], envp[2]);
 #endif
 
 	/*add our prop end*/
