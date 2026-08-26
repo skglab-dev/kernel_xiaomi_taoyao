@@ -5600,7 +5600,7 @@ static void generate_xm_charge_uvent(struct work_struct *work)
 	return;
 }
 
-#define CHARGING_PERIOD_S		60
+#define CHARGING_PERIOD_S		30
 #define DISCHARGE_PERIOD_S		300
 
 static void xm_charger_debug_info_print_work(struct work_struct *work)
