@@ -5726,7 +5726,6 @@ static int fb_notifier_callback(struct notifier_block *nb,
 						     fb_notifier);
 	struct mi_disp_notifier *evdata = data;
 	unsigned int blank;
-	int rc;
 
 	if(val != MI_DISP_DPMS_EVENT)
 		return NOTIFY_OK;
@@ -5742,10 +5741,7 @@ static int fb_notifier_callback(struct notifier_block *nb,
 			bcdev->blank_state = FB_UNBLANK;
 		}
 
-		rc = write_property_id(bcdev, &bcdev->psy_list[PSY_TYPE_XM],
-				XM_PROP_FB_BLANK_STATE, bcdev->blank_state);
-		if (rc < 0)
-			return rc;
+		schedule_work(&bcdev->fb_notifier_work);
 	}
 	return NOTIFY_OK;
 }
