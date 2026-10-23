@@ -115,7 +115,7 @@ struct dc_plane_state *dc_create_plane_state(struct dc *dc)
 	struct dc *core_dc = dc;
 
 	struct dc_plane_state *plane_state = kvzalloc(sizeof(*plane_state),
-							GFP_ATOMIC);
+						      GFP_KERNEL);
 
 	if (NULL == plane_state)
 		return NULL;

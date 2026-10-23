@@ -2566,10 +2566,8 @@ static int client_states_open(struct inode *inode, struct file *file)
 		return -ENXIO;
 
 	ret = seq_open(file, &states_seq_ops);
-	if (ret) {
-		drop_client(clp);
+	if (ret)
 		return ret;
-	}
 	s = file->private_data;
 	s->private = clp;
 	return 0;

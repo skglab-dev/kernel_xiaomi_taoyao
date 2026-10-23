@@ -24,10 +24,7 @@
 #include <crypto/hash_info.h>
 
 #define TPM_DIGEST_SIZE 20	/* Max TPM v1.2 PCR size */
-
-#define TPM2_MAX_DIGEST_SIZE	SHA512_DIGEST_SIZE
-#define TPM2_MAX_PCR_BANKS	8
-#define TPM_MAX_DIGEST_SIZE	TPM2_MAX_DIGEST_SIZE
+#define TPM_MAX_DIGEST_SIZE SHA512_DIGEST_SIZE
 
 struct tpm_chip;
 struct trusted_key_payload;
@@ -46,7 +43,7 @@ enum tpm_algorithms {
 
 struct tpm_digest {
 	u16 alg_id;
-	u8 digest[TPM2_MAX_DIGEST_SIZE];
+	u8 digest[TPM_MAX_DIGEST_SIZE];
 } __packed;
 
 struct tpm_bank_info {
@@ -150,7 +147,7 @@ struct tpm_chip {
 	unsigned int groups_cnt;
 
 	u32 nr_allocated_banks;
-	struct tpm_bank_info allocated_banks[TPM2_MAX_PCR_BANKS];
+	struct tpm_bank_info *allocated_banks;
 #ifdef CONFIG_ACPI
 	acpi_handle acpi_dev_handle;
 	char ppi_version[TPM_PPI_VERSION_LEN + 1];

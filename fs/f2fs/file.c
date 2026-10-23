@@ -1448,8 +1448,7 @@ static int f2fs_do_zero_range(struct dnode_of_data *dn, pgoff_t start,
 		f2fs_set_data_blkaddr(dn);
 	}
 
-	if (index > start)
-		f2fs_update_extent_cache_range(dn, start, 0, index - start);
+	f2fs_update_extent_cache_range(dn, start, 0, index - start);
 
 	return ret;
 }

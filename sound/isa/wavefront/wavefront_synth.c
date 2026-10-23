@@ -944,9 +944,9 @@ wavefront_send_sample (snd_wavefront_t *dev,
 	if (header->size) {
 		dev->freemem = wavefront_freemem (dev);
 
-		if (dev->freemem < 0 || dev->freemem < header->size) {
+		if (dev->freemem < (int)header->size) {
 			snd_printk ("insufficient memory to "
-				    "load %u byte sample.\n",
+				    "load %d byte sample.\n",
 				    header->size);
 			return -ENOMEM;
 		}

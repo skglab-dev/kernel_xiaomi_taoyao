@@ -451,7 +451,7 @@ retry:
 				goto retry;
 			}
 		}
-		if (rc <= 0) {
+		if (!rc) {
 			result = false;
 			goto out;
 		}

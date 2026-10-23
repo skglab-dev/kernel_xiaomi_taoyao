@@ -1200,7 +1200,7 @@ static struct fwnode_handle *acpi_graph_get_next_endpoint(
 
 	if (!prev) {
 		do {
-			port = acpi_get_next_subnode(fwnode, port);
+			port = fwnode_get_next_child_node(fwnode, port);
 			/*
 			 * The names of the port nodes begin with "port@"
 			 * followed by the number of the port node and they also
@@ -1218,13 +1218,13 @@ static struct fwnode_handle *acpi_graph_get_next_endpoint(
 	if (!port)
 		return NULL;
 
-	endpoint = acpi_get_next_subnode(port, prev);
+	endpoint = fwnode_get_next_child_node(port, prev);
 	while (!endpoint) {
-		port = acpi_get_next_subnode(fwnode, port);
+		port = fwnode_get_next_child_node(fwnode, port);
 		if (!port)
 			break;
 		if (is_acpi_graph_node(port, "port"))
-			endpoint = acpi_get_next_subnode(port, NULL);
+			endpoint = fwnode_get_next_child_node(port, NULL);
 	}
 
 	/*
@@ -1389,7 +1389,6 @@ static int acpi_fwnode_graph_parse_endpoint(const struct fwnode_handle *fwnode,
 	if (fwnode_property_read_u32(fwnode, "reg", &endpoint->id))
 		fwnode_property_read_u32(fwnode, "endpoint", &endpoint->id);
 
-	fwnode_handle_put(port_fwnode);
 	return 0;
 }
 

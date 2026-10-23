@@ -100,13 +100,7 @@ static int __ocfs2_move_extent(handle_t *handle,
 
 	rec = &el->l_recs[index];
 
-	if (ext_flags != rec->e_flags) {
-		ret = ocfs2_error(inode->i_sb,
-				  "Inode %llu has corrupted extent %d with flags 0x%x at cpos %u\n",
-				  (unsigned long long)ino, index, rec->e_flags, cpos);
-		goto out;
-	}
-
+	BUG_ON(ext_flags != rec->e_flags);
 	/*
 	 * after moving/defraging to new location, the extent is not going
 	 * to be refcounted anymore.
